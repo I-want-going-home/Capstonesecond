@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+
+//#region EJS 세팅
 // EJS 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'Front'));
@@ -32,8 +34,11 @@ app.get('/', (req, res) => {
     });
 });
 
+//#endregion
+
+
 // 서버 포트 설정
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(` 서버 시작 >> http://localhost:${PORT} << `);
 });
