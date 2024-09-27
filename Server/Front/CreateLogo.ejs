@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title><%= title %> - Start Bootstrap Template</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container px-5">
+            <a class="navbar-brand" href="#!"><%= brandName %></a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <% navItems.forEach(function(item) { %>
+                        <li class="nav-item"><a class="nav-link <%= item.active ? 'active' : '' %>" href="<%= item.link %>"><%= item.name %></a></li>
+                    <% }); %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-dark py-5">
+        <div class="container px-5">
+            <h1 class="display-5 fw-bolder text-white mb-2"><%= headerTitle %></h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <form action="/generate-logo" method="POST">
+            <div class="mb-3">
+                <label for="prompt" class="form-label text-white">로고 프롬프트 입력:</label>
+                <input type="text" class="form-control" id="prompt" name="prompt" placeholder="여기에 원하는 프롬포트를 적어주세요" required>
+            </div>
+            <button type="submit" class="btn btn-primary">로고 생성</button>
+        </form>
+
+        <% if (logoImage) { %>
+            <h2 class="mt-5 text-white">생성된 로고:</h2>
+            <img src="<%= logoImage %>" alt="Generated Logo" class="img-fluid mt-3">
+        <% } %>
+    </div>
+
+    <footer class="py-5 bg-dark">
+        <div class="container px-5">
+            <p class="m-0 text-center text-white">Copyright &copy; <%= new Date().getFullYear() %> <%= footerText %></p>
+        </div>
+    </footer>
+</body>
+</html>
