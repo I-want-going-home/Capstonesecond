@@ -3,80 +3,69 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title><%= title %> - Start Bootstrap Template</title>
-    <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-    <!-- Bootstrap icons-->
+    <meta name="description" content="저작권 확인 페이지" />
+    <meta name="author" content="캡스톤 디자인 팀" />
+    <title>저작권 확인 - <%= title %></title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
-    <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="css/styles.css" rel="stylesheet" />
+    <link href="/css/styles.css" rel="stylesheet" />
 </head>
 <body>
-    <!-- Responsive navbar-->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container px-5">
-            <a class="navbar-brand" href="#!"><%= brandName %></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <a class="navbar-brand" href="/">CLC</a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <% navItems.forEach(function(item) { %>
-                        <li class="nav-item">
-                            <a class="nav-link <%= item.active ? 'active' : '' %>" href="<%= item.link === '#!' ? '#' : item.link %>"><%= item.name %></a>
-                        </li>
-                    <% }); %>
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/create-logo">LogoCreate</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/classification">Classification</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Header-->
     <header class="bg-dark py-5">
         <div class="container px-5">
             <div class="row gx-5 justify-content-center">
                 <div class="col-lg-6">
                     <div class="text-center my-5">
-                        <h1 class="display-5 fw-bolder text-white mb-2"><%= headerTitle %></h1>
-                        <p class="lead text-white-50 mb-1"><%= headerDescription1 %></p>
-                        <p class="lead text-white-50 mb-4"><%= headerDescription2 %></p>
+                        <h1 class="display-5 fw-bolder text-white mb-2">저작권 확인</h1>
+                        <p class="lead text-white-50 mb-4">이미지를 업로드하여 유사 이미지를 분석해보세요.</p>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Features section-->
-    <section class="py-5 border-bottom" id="features">
+    <section class="py-5" id="classification">
         <div class="container px-5 my-5">
-            <div class="row gx-5">
-                <% features.forEach(function(feature) { %>
-                    <div class="col-lg-4 mb-5 mb-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-                            <i class="bi <%= feature.icon %>"></i>
-                        </div>
-                        <h2 class="h4 fw-bolder"><%= feature.title %></h2>
-                        <p><%= feature.description %></p>
-                        <a class="text-decoration-none" href="<%= feature.link === '#!' ? '#' : feature.link %>">바로가기 <i class="bi bi-arrow-right"></i></a>
-                    </div>
-                <% }); %>
+            <h2 class="fw-bolder mb-4">이미지 업로드 및 분석</h2>
+
+            <!-- 이미지 업로드 폼 -->
+            <form action="/classification" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="image" class="form-label">분석할 이미지를 업로드하세요:</label>
+                    <input class="form-control" type="file" id="image" name="image" required>
+                </div>
+                <button type="submit" class="btn btn-primary">분석하기</button>
+            </form>
+
+            <% if (result) { %>
+            <!-- 분석 결과 표시 -->
+            <div class="mt-5">
+                <h3>분석 결과</h3>
+                <p>업로드한 이미지와 가장 유사한 이미지: <strong><%= result.similarImage %></strong></p>
+                <p>유사도: <strong><%= result.similarity %>%</strong></p>
+                <img src="<%= result.similarImagePath %>" alt="유사한 이미지" class="img-fluid mt-3" />
             </div>
+            <% } %>
+
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="py-5 bg-dark">
-        <div class="container px-5">
-            <p class="m-0 text-center text-white">Copyright &copy; <%= new Date().getFullYear() %> <%= footerText %></p>
-        </div>
+        <div class="container px-5"><p class="m-0 text-center text-white">Copyright &copy; <%= new Date().getFullYear() %> CLC</p></div>
     </footer>
-
-    <!-- Bootstrap core JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Core theme JS -->
-    <script src="js/scripts.js"></script>
 </body>
 </html>
