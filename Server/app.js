@@ -1,32 +1,29 @@
 const express = require('express');
 const path = require('path');
-const { exec } = require('child_process'); // Python 스크립트 실행을 위한 모듈
-const bodyParser = require('body-parser'); // 폼 데이터 파싱을 위한 모듈
-const multer = require('multer'); // 파일 업로드를 위한 모듈
-const axios = require('axios'); // Python 서버와 통신하기 위한 모듈
+const { exec } = require('child_process');
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const axios = require('axios');
 const fs = require('fs');
-const FormData = require('form-data'); // FormData 객체를 이용해 파일 전송
+const FormData = require('form-data');
 const app = express();
 
-// EJS 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'Front'));
 app.use('/assets', express.static(path.join(__dirname, 'Front/assets')));
 app.use('/css', express.static(path.join(__dirname, 'Front/css')));
-app.use(bodyParser.urlencoded({ extended: true })); // URL-encoded 데이터 파싱
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// 파일 업로드를 위한 multer 설정
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // 파일 업로드 경로
+        cb(null, 'C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload');
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname)); // 파일명
+        cb(null, Date.now() + path.extname(file.originalname));
     }
 });
 const upload = multer({ storage: storage });
 
-// 메인 페이지 라우팅
 app.get('/', (req, res) => {
     res.render('index', {
         title: 'Business Frontpage',
@@ -49,12 +46,11 @@ app.get('/', (req, res) => {
     });
 });
 
-// CreateLogo 페이지
 app.get('/create-logo', (req, res) => {
     res.render('CreateLogo', {
         title: 'Create Your Logo',
         brandName: 'CLC',
-        logoImage: null, // 초기값 null
+        logoImage: null,
         navItems: [
             { name: 'Home', link: '/', active: false },
             { name: 'LogoCreate', link: '/create-logo', active: true },
@@ -66,42 +62,48 @@ app.get('/create-logo', (req, res) => {
     });
 });
 
-// Classification 페이지
 app.get('/classification', (req, res) => {
     res.render('Classification', {
         title: 'Classification Your Logo',
         brandName: 'CLC',
-        result: null // 결과 초기화
+        result: null
     });
 });
 
-// 파일 업로드 및 유사도 분석을 처리할 라우트
 app.post('/classification', upload.single('image'), async (req, res) => {
     try {
-        const imageFilePath = path.join(__dirname, 'uploads', req.file.filename);
+        const imageFilePath = path.join('C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload', req.file.filename);
 
-        // Python 서버에 이미지 전달
-        const formData = new FormData();
-        formData.append('image', fs.createReadStream(imageFilePath));
-
-        const pythonServerUrl = 'http://localhost:5000/process-image'; // Python 서버 URL
-        const pythonResponse = await axios.post(pythonServerUrl, formData, {
-            headers: {
-                ...formData.getHeaders(),
-            },
-        });
-
-        const result = pythonResponse.data; // Python에서 받은 결과
-
-        // 분석 결과를 Classification 페이지로 렌더링
-        res.render('Classification', {
-            title: '저작권 확인',
-            brandName: 'CLC',
-            result: {
-                similarImage: result.similarImage, // 유사한 이미지 정보
-                similarity: result.similarity, // 유사도 퍼센트
-                similarImagePath: `/uploads/${result.similarImage}` // 유사 이미지 경로
+        exec(`python "C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\ClassificationAI\\image_similarity.py" "${imageFilePath}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error executing Python script: ${error}`);
+                console.error(stderr);
+                return res.status(500).send('이미지 분석 중 오류 발생');
             }
+
+            if (stderr) {
+                console.error(`Python script stderr: ${stderr}`);
+            }
+
+            console.log(`Python script stdout: ${stdout}`);
+
+            let result;
+            try {
+                result = JSON.parse(stdout);
+            } catch (parseError) {
+                console.error(`Error parsing JSON: ${parseError}`);
+                return res.status(500).send('이미지 분석 중 오류 발생');
+            }
+
+            res.render('Classification', {
+                title: '저작권 확인',
+                brandName: 'CLC',
+                result: {
+                    similarImage: result.similarImage,
+                    similarity: result.similarity,
+                    similarImagePath: `/uploads/${result.similarImage}`
+                }
+            });
         });
     } catch (error) {
         console.error(error);
@@ -109,7 +111,6 @@ app.post('/classification', upload.single('image'), async (req, res) => {
     }
 });
 
-// 서버 시작
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`서버 시작 >> http://localhost:${PORT} <<`);
