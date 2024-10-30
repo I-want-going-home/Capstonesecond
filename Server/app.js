@@ -3,15 +3,17 @@ const path = require('path');
 const { exec } = require('child_process');
 const bodyParser = require('body-parser');
 const multer = require('multer');
-const axios = require('axios');
-const fs = require('fs');
-const FormData = require('form-data');
 const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'Front'));
 app.use('/assets', express.static(path.join(__dirname, 'Front/assets')));
 app.use('/css', express.static(path.join(__dirname, 'Front/css')));
+
+// 업로드된 파일을 제공할 경로 설정
+app.use('/uploads', express.static(path.join('C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload')));
+app.use('/DB', express.static(path.join('C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\DB'))); // 경로 수정
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const storage = multer.diskStorage({
@@ -92,17 +94,14 @@ app.post('/classification', upload.single('image'), async (req, res) => {
                 result = JSON.parse(stdout);
             } catch (parseError) {
                 console.error(`Error parsing JSON: ${parseError}`);
+                console.log(`Raw output: ${stdout}`);
                 return res.status(500).send('이미지 분석 중 오류 발생');
             }
 
             res.render('Classification', {
                 title: '저작권 확인',
                 brandName: 'CLC',
-                result: {
-                    similarImage: result.similarImage,
-                    similarity: result.similarity,
-                    similarImagePath: `/uploads/${result.similarImage}`
-                }
+                result: result.similarImages || [] // 유사 이미지를 results로 설정
             });
         });
     } catch (error) {
@@ -113,5 +112,5 @@ app.post('/classification', upload.single('image'), async (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`서버 시작 >> http://localhost:${PORT} <<`);
+    console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
 });
