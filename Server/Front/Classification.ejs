@@ -10,11 +10,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="/css/styles.css" rel="stylesheet" />
     <style>
-        /* 이미지 크기 조정 */
         .similar-image {
-            width: 200px; /* 원하는 너비로 조정 */
-            height: auto; /* 비율을 유지하기 위해 자동 설정 */
-            margin: 10px; /* 이미지 간격 */
+            width: 200px;
+            height: auto;
+            margin: 10px;
         }
     </style>
 </head>
@@ -50,7 +49,6 @@
         <div class="container px-5 my-5">
             <h2 class="fw-bolder mb-4">이미지 업로드 및 분석</h2>
 
-            <!-- 이미지 업로드 폼 -->
             <form action="/classification" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="image" class="form-label">분석할 이미지를 업로드하세요:</label>
@@ -60,7 +58,6 @@
             </form>
 
             <% if (result && result.length > 0) { %>
-                <!-- 분석 결과 표시 -->
                 <div class="mt-5">
                     <h3>분석 결과</h3>
                     <ul>
@@ -73,10 +70,24 @@
                         <% }) %>
                     </ul>
                 </div>
+
+                <% if (alerts && alerts.length > 0) { %>
+                    <script>
+                        // alerts를 JSON 문자열로 변환 후 JavaScript 배열로 변환
+                        var alerts = <%- JSON.stringify(alerts) %>;
+                
+                        // alerts 배열이 있으면 하나씩 alert()로 표시
+                        alerts.forEach(function(alertMessage) {
+                            alert(alertMessage);
+                        });
+                    </script>
+                <% } %>
+                
+
+
             <% } else if (result) { %>
                 <p>유사한 이미지가 없습니다.</p>
             <% } %>
-
         </div>
     </section>
 

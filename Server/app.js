@@ -98,10 +98,16 @@ app.post('/classification', upload.single('image'), async (req, res) => {
                 return res.status(500).send('이미지 분석 중 오류 발생');
             }
 
+            // 유사도 점수가 90 이상인 경우 경고 메시지
+            const alertMessages = result.similarImages.filter(item => parseFloat(item.similarity) >= 90)
+                .map(item => `경고: 이미지 ${item.similarImage}와 유사도가 ${item.similarity}%입니다.`);
+
+            // result와 경고 메시지를 전달
             res.render('Classification', {
                 title: '저작권 확인',
                 brandName: 'CLC',
-                result: result.similarImages || [] // 유사 이미지를 results로 설정
+                result: result.similarImages || [],
+                alerts: alertMessages
             });
         });
     } catch (error) {
@@ -109,6 +115,7 @@ app.post('/classification', upload.single('image'), async (req, res) => {
         res.status(500).send('이미지 분석 중 오류 발생');
     }
 });
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
