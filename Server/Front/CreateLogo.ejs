@@ -42,8 +42,38 @@
         <% if (logoImage) { %>
             <h2 class="mt-5 text-white">생성된 로고:</h2>
             <img src="<%= logoImage %>" alt="Generated Logo" class="img-fluid mt-3">
+            
+            <div class="button-container d-flex justify-content-center gap-2 mt-3">
+                <button class="btn btn-primary" onclick="location.reload()">다시 생성</button>
+                <button class="btn btn-success" id="save-button">저장</button>
+                <button class="btn btn-success" onclick="window.location.href='/classification'">분류로 이동</button>
+            </div>
         <% } %>
     </div>
+
+    <style>
+        .container img {
+        display: block;
+        margin: 0 auto;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+    </style>
+
+    <script>
+        document.getElementById('save-button').addEventListener('click', () => {
+            const image = document.querySelector('img');
+            const link = document.createElement('a');
+            link.href = image.src;
+            link.download = 'logo.png';
+            link.click();
+        });
+    </script>
 
     <footer class="py-5 bg-dark">
         <div class="container px-5">
