@@ -34,7 +34,7 @@ with torch.no_grad():  # 기울기 계산 비활성화
 image = generated_images[0]
 
 # 저장할 경로 설정
-output_folder = "D:\\git\\Capstonesecond\\AI\\Upload"
+output_folder = "C:\Users\User1\Documents\GitHub\Capstonesecond\AI\CreatedLogo"
 
 # 경로가 존재하지 않으면 폴더 생성
 if not os.path.exists(output_folder):

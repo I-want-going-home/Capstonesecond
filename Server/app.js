@@ -14,16 +14,14 @@ app.use(bodyParser.json());
 
 app.use('/assets', express.static(path.join(__dirname, 'Front/assets')));
 app.use('/css', express.static(path.join(__dirname, 'Front/css')));
-app.use('/uploads', express.static("D:\\git\\Capstonesecond\\AI\\Upload"));
-
+app.use('/uploads', express.static("C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload"));
 
 const upload = multer({
     storage: multer.diskStorage({
-        destination: "D:\\git\\Capstonesecond\\AI\\Upload",
+        destination: "C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload",
         filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
     })
 });
-
 
 const commonRenderVars = {
     brandName: 'CLC',
@@ -35,7 +33,6 @@ const commonRenderVars = {
     ],
     footerText: '캡스톤디자인 2학기'
 };
-
 
 app.get('/', (req, res) => {
     res.render('index', {
@@ -52,24 +49,26 @@ app.get('/', (req, res) => {
     });
 });
 
-
 app.get('/create-logo', (req, res) => {
     res.render('CreateLogo', { ...commonRenderVars, title: 'Create Your Logo', headerTitle: '로고 생성하기', logoImage: null });
 });
-
 
 app.post('/generate-logo', async (req, res) => {
     const prompt = req.body.prompt;
 
     console.log('Received prompt:', prompt);
-  
-    exec(`python "D:/git/Capstonesecond/AI_IMAGECREATE.py" "${prompt}"`, (error, stdout, stderr) => {
-        if (error || !stdout.trim()) return res.status(500).send('로고 생성 중 오류 발생');
-        
+
+    exec(`python "C:/Users/User1/Documents/GitHub/Capstonesecond/AI_IMAGECREATE2.py" "${prompt}"`, (error, stdout, stderr) => {
+        if (error || !stdout.trim()) {
+            console.error(`Error: ${error}`);
+            console.error(`stderr: ${stderr}`);
+            return res.status(500).send('로고 생성 중 오류 발생');
+        }
+
         const logoImagePath = stdout.trim();
-  
-        const imageUrl = `/uploads/${logoImagePath.split('\\').pop()}`;
-  
+        console.log(`Generated logo path: ${logoImagePath}`);
+        const imageUrl = path.join("C:/Users/User1/Documents/GitHub/Capstonesecond/AI/CreatedLogo", path.basename(logoImagePath));
+
         res.render('CreateLogo', {
             ...commonRenderVars,
             title: 'Create Your Logo',
@@ -79,13 +78,12 @@ app.post('/generate-logo', async (req, res) => {
     });
 });
 
-
 app.post('/save-logo', (req, res) => {
     const currentPath = path.join(__dirname, 'AI', 'Upload', req.body.currentPath.split('/').pop());
     const newName = req.body.newName;
-  
+
     const newFilePath = path.join('D:\\git\\Capstonesecond\\AI\\Upload', `${newName}.png`);
-  
+
     fs.copyFile(currentPath, newFilePath, (err) => {
         if (err) {
             console.error('파일 저장 실패:', err);
@@ -96,7 +94,6 @@ app.post('/save-logo', (req, res) => {
     });
 });
 
-
 app.get('/classification', (req, res) => {
     res.render('Classification', {
         ...commonRenderVars,
@@ -105,53 +102,64 @@ app.get('/classification', (req, res) => {
     });
 });
 
-
 app.post('/classification', upload.single('image'), async (req, res) => {
+    let alerts = [];
     try {
-        const imageFilePath = path.join('D:\\git\\Capstonesecond\\AI\\Upload', req.file.filename);
+        const imageFilePath = path.join('C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload', req.file.filename);
 
-        exec(`python "D:/git/Capstonesecond/AI/ClassificationAI/image_similarity.py" "${imageFilePath}"`, (error, stdout, stderr) => {
+        exec(`python "C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\ClassificationAI\\image_similarity2.py" "${imageFilePath}"`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error executing Python script: ${error}`);
                 console.error(stderr);
-                return res.status(500).send('이미지 분석 중 오류 발생');
+                alerts.push('이미지 분석 중 오류가 발생했습니다.');
+                return res.render('Classification', {
+                    ...commonRenderVars,
+                    title: 'Classification Your Logo',
+                    result: null,
+                    alerts
+                });
             }
 
             if (stderr) {
                 console.error(`Python script stderr: ${stderr}`);
+                alerts.push('Python 스크립트 실행 중 경고가 발생했습니다.');
             }
 
             console.log(`Python script stdout: ${stdout}`);
 
-            let result;
-            try {
-                result = JSON.parse(stdout);
-            } catch (parseError) {
-                console.error(`Error parsing JSON: ${parseError}`);
-                console.log(`Raw output: ${stdout}`);
-                return res.status(500).send('이미지 분석 중 오류 발생');
+            const result = JSON.parse(stdout);
+
+            // 유사도가 90% 이상인 경우 경고 메시지를 추가
+            if (result.similarImages) {
+                result.similarImages.forEach(item => {
+                    if (item.similarity >= 90) {
+                        alerts.push(`유사도 ${item.similarity}%: 유사한 이미지가 발견되었습니다.`);
+                    }
+                });
             }
 
-            // 유사도 점수가 90 이상인 경우 경고 메시지
-            const alertMessages = result.similarImages.filter(item => parseFloat(item.similarity) >= 90)
-                .map(item => `경고: 이미지 ${item.similarImage}와 유사도가 ${item.similarity}%입니다.`);
-
-            // result와 경고 메시지를 전달
             res.render('Classification', {
                 ...commonRenderVars,
-                title: '저작권 확인',
-                result: result.similarImages || [],
-                alerts: alertMessages
+                title: 'Classification Your Logo',
+                result,
+                alerts
             });
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('이미지 분석 중 오류 발생');
+        console.error('Error:', error);
+        alerts.push('이미지 분석 중 오류가 발생했습니다.');
+        res.render('Classification', {
+            ...commonRenderVars,
+            title: 'Classification Your Logo',
+            result: null,
+            alerts
+        });
     }
 });
 
 
+
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
+    console.log(`로컬 서버 시작 : ${PORT}`);
 });

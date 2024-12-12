@@ -57,36 +57,33 @@
                 <button type="submit" class="btn btn-primary">분석하기</button>
             </form>
 
-            <% if (result && result.length > 0) { %>
+            <% if (result && result.similarImages && result.similarImages.length > 0) { %>
                 <div class="mt-5">
                     <h3>분석 결과</h3>
                     <ul>
-                        <% result.forEach(function(item) { %>
+                        <% result.similarImages.forEach(function(item) { %>
                             <li>
                                 업로드한 이미지와 가장 유사한 이미지: <strong><%= item.similarImage %></strong><br>
                                 유사도: <strong><%= item.similarity %>%</strong><br>
-                                <img src="/DB/<%= item.similarImage %>" alt="유사한 이미지" class="similar-image" />
+                                <img src="data:image/png;base64,<%= item.imageData %>" alt="유사한 이미지" class="similar-image" />
                             </li>
                         <% }) %>
                     </ul>
                 </div>
-
-                <% if (alerts && alerts.length > 0) { %>
-                    <script>
-                        // alerts를 JSON 문자열로 변환 후 JavaScript 배열로 변환
-                        var alerts = <%- JSON.stringify(alerts) %>;
-                
-                        // alerts 배열이 있으면 하나씩 alert()로 표시
-                        alerts.forEach(function(alertMessage) {
-                            alert(alertMessage);
-                        });
-                    </script>
-                <% } %>
-                
-
-
             <% } else if (result) { %>
                 <p>유사한 이미지가 없습니다.</p>
+            <% } %>
+
+            <% if (alerts && alerts.length > 0) { %>
+                <script>
+                    // alerts를 JSON 문자열로 변환 후 JavaScript 배열로 변환
+                    var alerts = <%- JSON.stringify(alerts) %>;
+            
+                    // alerts 배열이 있으면 하나씩 alert()로 표시
+                    alerts.forEach(function(alertMessage) {
+                        alert(alertMessage);
+                    });
+                </script>
             <% } %>
         </div>
     </section>
