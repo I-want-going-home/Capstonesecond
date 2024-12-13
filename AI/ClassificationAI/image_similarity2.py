@@ -7,7 +7,7 @@ import imagehash
 import io
 import os
 
-# MySQL µ¥ÀÌÅÍº£ÀÌ½º¿¡ ¿¬°á
+# MySQL ï¿½ï¿½ï¿½ï¿½ï¿½Íºï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 db_connection = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -15,7 +15,7 @@ db_connection = mysql.connector.connect(
     database="capstonsecond"
 )
 
-# Ä¿¼­ »ý¼º
+# Ä¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 cursor = db_connection.cursor()
 
 def get_image_hash(image, hash_size=16):
@@ -83,7 +83,7 @@ def find_similar_images(image_path, hash_size=16):
     return similar_images[:3]
 
 if __name__ == "__main__":
-    upload_folder = r"C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload\\"
+    upload_folder = r"C:\Users\105\Documents\GitHub\Capstonesecond\AI\Upload"
     files_in_folder = os.listdir(upload_folder)
     image_files = [f for f in files_in_folder if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
 

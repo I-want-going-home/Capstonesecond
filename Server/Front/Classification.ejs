@@ -76,15 +76,16 @@
 
             <% if (alerts && alerts.length > 0) { %>
                 <script>
-                    // alerts를 JSON 문자열로 변환 후 JavaScript 배열로 변환
+                    // alerts 배열을 JavaScript에서 사용할 수 있도록 변환
                     var alerts = <%- JSON.stringify(alerts) %>;
             
-                    // alerts 배열이 있으면 하나씩 alert()로 표시
+                    // alerts 배열의 메시지를 하나씩 팝업으로 표시
                     alerts.forEach(function(alertMessage) {
                         alert(alertMessage);
                     });
                 </script>
             <% } %>
+            
         </div>
     </section>
 

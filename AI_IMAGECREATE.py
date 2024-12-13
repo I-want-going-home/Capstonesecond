@@ -7,7 +7,7 @@ import os
 
 # 모델 경로 설정
 base_model_id = "runwayml/stable-diffusion-v1-5"
-lora_model_id = "D:/git/sd.webui/webui/models/Lora/logo_v1-000012.safetensors"
+lora_model_id = "C:\Users\105\Documents\GitHub\Capstonesecond\AI\LogoAI\logo_v1-000012.safetensors"
 
 # 파이프라인 생성 및 장치 설정
 pipe = StableDiffusionPipeline.from_pretrained(base_model_id, torch_dtype=torch.float16)

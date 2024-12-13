@@ -14,11 +14,11 @@ app.use(bodyParser.json());
 
 app.use('/assets', express.static(path.join(__dirname, 'Front/assets')));
 app.use('/css', express.static(path.join(__dirname, 'Front/css')));
-app.use('/uploads', express.static("C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload"));
+app.use('/uploads', express.static("C:\Users\\105\Documents\GitHub\Capstonesecond\AI\Upload"));
 
 const upload = multer({
     storage: multer.diskStorage({
-        destination: "C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload",
+        destination: "C:\Users\\105\Documents\GitHub\Capstonesecond\AI\Upload",
         filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
     })
 });
@@ -58,7 +58,7 @@ app.post('/generate-logo', async (req, res) => {
 
     console.log('Received prompt:', prompt);
 
-    exec(`python "C:/Users/User1/Documents/GitHub/Capstonesecond/AI_IMAGECREATE2.py" "${prompt}"`, (error, stdout, stderr) => {
+    exec(`python "C:\Users\\105\Documents\GitHub\Capstonesecond\AI_IMAGECREATE.py" "${prompt}"`, (error, stdout, stderr) => {
         if (error || !stdout.trim()) {
             console.error(`Error: ${error}`);
             console.error(`stderr: ${stderr}`);
@@ -67,7 +67,7 @@ app.post('/generate-logo', async (req, res) => {
 
         const logoImagePath = stdout.trim();
         console.log(`Generated logo path: ${logoImagePath}`);
-        const imageUrl = path.join("C:/Users/User1/Documents/GitHub/Capstonesecond/AI/CreatedLogo", path.basename(logoImagePath));
+        const imageUrl = path.join("C:\Users\\105\Documents\GitHub\Capstonesecond\AI\CreatedLogo", path.basename(logoImagePath));
 
         res.render('CreateLogo', {
             ...commonRenderVars,
@@ -82,7 +82,7 @@ app.post('/save-logo', (req, res) => {
     const currentPath = path.join(__dirname, 'AI', 'Upload', req.body.currentPath.split('/').pop());
     const newName = req.body.newName;
 
-    const newFilePath = path.join('D:\\git\\Capstonesecond\\AI\\Upload', `${newName}.png`);
+    const newFilePath = path.join('C:\Users\\105\Documents\GitHub\Capstonesecond\AI\Upload', `${newName}.png`);
 
     fs.copyFile(currentPath, newFilePath, (err) => {
         if (err) {
@@ -98,19 +98,19 @@ app.get('/classification', (req, res) => {
     res.render('Classification', {
         ...commonRenderVars,
         title: 'Classification Your Logo',
-        result: null
+        result: null,
+        alerts: []
     });
 });
 
 app.post('/classification', upload.single('image'), async (req, res) => {
     let alerts = [];
     try {
-        const imageFilePath = path.join('C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\Upload', req.file.filename);
+        const imageFilePath = path.join(__dirname, 'AI', 'Upload', req.file.filename);
 
-        exec(`python "C:\\Users\\User1\\Documents\\GitHub\\Capstonesecond\\AI\\ClassificationAI\\image_similarity2.py" "${imageFilePath}"`, (error, stdout, stderr) => {
+        exec(`python "C:\Users\\105\Documents\GitHub\Capstonesecond\AI\ClassificationAI\image_similarity2.py" "${imageFilePath}"`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error executing Python script: ${error}`);
-                console.error(stderr);
                 alerts.push('이미지 분석 중 오류가 발생했습니다.');
                 return res.render('Classification', {
                     ...commonRenderVars,
@@ -121,15 +121,25 @@ app.post('/classification', upload.single('image'), async (req, res) => {
             }
 
             if (stderr) {
-                console.error(`Python script stderr: ${stderr}`);
+                console.warn(`Python script stderr: ${stderr}`);
                 alerts.push('Python 스크립트 실행 중 경고가 발생했습니다.');
             }
 
-            console.log(`Python script stdout: ${stdout}`);
+            let result;
+            try {
+                result = JSON.parse(stdout);
+            } catch (parseError) {
+                console.error(`Error parsing JSON from Python script: ${parseError}`);
+                alerts.push('Python 스크립트에서 잘못된 데이터를 반환했습니다.');
+                return res.render('Classification', {
+                    ...commonRenderVars,
+                    title: 'Classification Your Logo',
+                    result: null,
+                    alerts
+                });
+            }
 
-            const result = JSON.parse(stdout);
-
-            // 유사도가 90% 이상인 경우 경고 메시지를 추가
+            // 유사도가 90% 이상인 경우 경고 메시지 추가
             if (result.similarImages) {
                 result.similarImages.forEach(item => {
                     if (item.similarity >= 90) {
@@ -145,9 +155,9 @@ app.post('/classification', upload.single('image'), async (req, res) => {
                 alerts
             });
         });
-    } catch (error) {
-        console.error('Error:', error);
-        alerts.push('이미지 분석 중 오류가 발생했습니다.');
+    } catch (e) {
+        console.error(e);
+        alerts.push('알 수 없는 오류가 발생했습니다.');
         res.render('Classification', {
             ...commonRenderVars,
             title: 'Classification Your Logo',
