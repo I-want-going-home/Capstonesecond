@@ -1,6 +1,7 @@
 # 소상공인을 위한 로고 생성 및 저작권 분류 홈페이지
 
 이 프로젝트는 이제 사회에 들어와 창업하는 사회인들이 자신만의 브랜딩 로고를 만들기 위해 제작되었습니다
+https://github.com/I-want-going-home/Capstonesecond
 
 ## 주요 기능
 
