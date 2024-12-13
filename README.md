@@ -50,9 +50,8 @@
     npm i multer
     ```
 
-4. Flask 서버 시작:
+4. Node.js 서버 시작:
     ```bash
     node app.js
     ```
 
-문의 사항이 있으면 이슈를 열거나 프로젝트 관리자에게 연락해 주세요.
